@@ -1,30 +1,38 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:flutter_codespaces/main.dart';
+import 'package:notely/main.dart';
+import 'package:notely/models/note.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('shows Supabase setup guidance when app is not configured', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const NotelyApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text('Notely 還差最後一步'), findsOneWidget);
+    expect(find.textContaining('SUPABASE_URL'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  test('maps a note to the Supabase insert payload', () {
+    final note = Note(
+      id: '',
+      userId: '',
+      title: '今天的想法',
+      content: '記得把想法寫下來。',
+      tag: '日記',
+      color: 'coral',
+      isPinned: true,
+      createdAt: DateTime.utc(2026, 1, 1),
+      updatedAt: DateTime.utc(2026, 1, 1),
+    );
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(note.toInsertMap('user-123'), {
+      'user_id': 'user-123',
+      'title': '今天的想法',
+      'content': '記得把想法寫下來。',
+      'tag': '日記',
+      'color': 'coral',
+      'is_pinned': true,
+    });
   });
 }
