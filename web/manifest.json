@@ -1,6 +1,6 @@
 {
-    "name": "flutter_codespaces",
-    "short_name": "flutter_codespaces",
+    "name": "CoupleLifeApp",
+    "short_name": "CoupleLifeApp",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

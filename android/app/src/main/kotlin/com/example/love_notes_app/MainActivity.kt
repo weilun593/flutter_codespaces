@@ -1,4 +1,4 @@
-package com.example.flutter_codespaces
+package com.example.CoupleLifeApp
 
 import io.flutter.embedding.android.FlutterActivity
 
