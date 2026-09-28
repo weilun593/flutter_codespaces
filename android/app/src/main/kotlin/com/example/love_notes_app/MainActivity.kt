@@ -1,4 +1,4 @@
-package com.example.CoupleLifeApp
+package com.example.NoteApp
 
 import io.flutter.embedding.android.FlutterActivity
 

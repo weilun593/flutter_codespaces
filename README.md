@@ -1,4 +1,4 @@
-# CoupleLifeApp
+# NoteApp
 
 A new Flutter project.
 

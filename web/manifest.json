@@ -1,6 +1,6 @@
 {
-    "name": "CoupleLifeApp",
-    "short_name": "CoupleLifeApp",
+    "name": "NoteApp",
+    "short_name": "NoteApp",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
