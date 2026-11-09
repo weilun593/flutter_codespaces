@@ -5,7 +5,7 @@ import './core/app_config.dart';
 import 'screens/auth_gate.dart';
 import 'screens/supabase_setup_screen.dart';
 import 'theme/app_theme.dart';
-
+//test
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
