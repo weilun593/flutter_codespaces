@@ -46,6 +46,10 @@
 				</dict>
 			</array>
 		</dict>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>需要您的位置資訊以提供附近服務</string>
+		<key>NSLocationAlwaysUsageDescription</key>
+		<string>需要您的位置資訊以提供背景定位功能</string>
 	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>

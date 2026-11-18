@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../models/note.dart';
 import '../repositories/notes_repository.dart';
@@ -108,6 +109,9 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _checkIn() async {
+    await Supabase.instance.client.auth.signOut();
+  }
   Future<void> _signOut() async {
     await Supabase.instance.client.auth.signOut();
   }
@@ -149,6 +153,18 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(width: 18),
           ],
+          IconButton(
+            tooltip: '打卡',
+            onPressed: () async {
+              try {
+                Position position = await LocationHelper.determinePosition();
+                print('緯度: ${position.latitude}, 經度: ${position.longitude}');
+              } catch (e) {
+                print('發生錯誤: $e');
+              }
+            },
+            icon: const Icon(Icons.logout_rounded),
+          ),
           IconButton(
             tooltip: '登出',
             onPressed: _signOut,
