@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-
+import '../utils/location_helper.dart';
 import '../models/note.dart';
 import '../repositories/notes_repository.dart';
 import '../theme/app_theme.dart';
