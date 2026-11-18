@@ -109,9 +109,10 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _checkIn() async {
+  /*Future<void> _checkIn() async {
     await Supabase.instance.client.auth.signOut();
-  }
+  }*/
+
   Future<void> _signOut() async {
     await Supabase.instance.client.auth.signOut();
   }
@@ -158,9 +159,21 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () async {
               try {
                 Position position = await LocationHelper.determinePosition();
-                print('緯度: ${position.latitude}, 經度: ${position.longitude}');
+                // ignore: use_build_context_synchronously
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('緯度: ${position.latitude}, 經度: ${position.longitude}'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
               } catch (e) {
-                print('發生錯誤: $e');
+                // ignore: use_build_context_synchronously
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('發生錯誤: $e'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
               }
             },
             icon: const Icon(Icons.logout_rounded),
