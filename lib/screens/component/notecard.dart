@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../models/note.dart';
 import '../../theme/app_theme.dart';
 

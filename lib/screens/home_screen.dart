@@ -7,6 +7,8 @@ import '../repositories/notes_repository.dart';
 import '../theme/app_theme.dart';
 import 'note_editor_screen.dart';
 import './component/notecard.dart';
+import './component/appbrand.dart';
+import './component/emptystate.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -146,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         toolbarHeight: 76,
         titleSpacing: isWide ? 32 : 20,
-        title: const _AppBrand(),
+        title: const AppBrand(),
         actions: [
           if (isWide) ...[
             Text(
@@ -307,9 +309,9 @@ class _HomeContent extends StatelessWidget {
             child: Center(child: CircularProgressIndicator()),
           )
         else if (errorMessage != null)
-          _ErrorState(message: errorMessage!, onRetry: onRetry)
+          ErrorState(message: errorMessage!, onRetry: onRetry)
         else if (notes.isEmpty)
-          _EmptyState(
+          EmptyState(
             hasSearch: searchController.text.isNotEmpty,
             onCreate: onOpenEditor,
           )
@@ -342,111 +344,6 @@ class _HomeContent extends StatelessWidget {
             },
           ),
       ],
-    );
-  }
-}
-
-class _AppBrand extends StatelessWidget {
-  const _AppBrand();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 38,
-          height: 38,
-          decoration: BoxDecoration(
-            color: AppColors.indigo,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Icon(
-            Icons.auto_stories_rounded,
-            color: Colors.white,
-            size: 21,
-          ),
-        ),
-        const SizedBox(width: 11),
-        Text('Notely', style: Theme.of(context).textTheme.titleLarge),
-      ],
-    );
-  }
-}
-
-class _EmptyState extends StatelessWidget {
-  const _EmptyState({required this.hasSearch, required this.onCreate});
-
-  final bool hasSearch;
-  final Future<void> Function([Note?]) onCreate;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 58, horizontal: 24),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.line),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            hasSearch ? Icons.search_off_rounded : Icons.edit_note_rounded,
-            size: 48,
-            color: AppColors.indigo.withValues(alpha: 0.7),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            hasSearch ? '沒有找到相符的筆記' : '這裡還是空的',
-            style: theme.textTheme.titleLarge,
-          ),
-          const SizedBox(height: 7),
-          Text(
-            hasSearch ? '換個關鍵字試試看。' : '把腦中的第一個想法寫下來吧。',
-            style: theme.textTheme.bodyMedium,
-          ),
-          if (!hasSearch) ...[
-            const SizedBox(height: 20),
-            OutlinedButton.icon(
-              onPressed: onCreate,
-              icon: const Icon(Icons.add_rounded),
-              label: const Text('寫下第一篇'),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _ErrorState extends StatelessWidget {
-  const _ErrorState({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF4F1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFF3C8BD)),
-      ),
-      child: Column(
-        children: [
-          const Icon(Icons.cloud_off_rounded, size: 38, color: AppColors.coral),
-          const SizedBox(height: 12),
-          Text(message, textAlign: TextAlign.center),
-          const SizedBox(height: 14),
-          OutlinedButton(onPressed: onRetry, child: const Text('重新載入')),
-        ],
-      ),
     );
   }
 }
