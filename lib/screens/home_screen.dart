@@ -9,6 +9,7 @@ import 'note_editor_screen.dart';
 import './component/notecard.dart';
 import './component/appbrand.dart';
 import './component/emptystate.dart';
+import './component/errorstate.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
