@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 
 class AppBrand extends StatelessWidget {
-  const _AppBrand();
+  const AppBrand();
 
   @override
   Widget build(BuildContext context) {
