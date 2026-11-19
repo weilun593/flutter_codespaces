@@ -6,7 +6,7 @@ import '../models/note.dart';
 import '../repositories/notes_repository.dart';
 import '../theme/app_theme.dart';
 import 'note_editor_screen.dart';
-import './component/notecard.dart'
+import './component/notecard.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -330,7 +330,7 @@ class _HomeContent extends StatelessWidget {
                     .map(
                       (note) => SizedBox(
                         width: cardWidth,
-                        child: _NoteCard(
+                        child: NoteCard(
                           note: note,
                           onTap: () => onOpenEditor(note),
                           onDelete: () => onDelete(note),

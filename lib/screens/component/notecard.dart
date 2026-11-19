@@ -1,5 +1,10 @@
-class _NoteCard extends StatelessWidget {
-  const _NoteCard({
+import 'package:flutter/material.dart';
+
+import '../../models/note.dart';
+import '../../theme/app_theme.dart';
+
+class NoteCard extends StatelessWidget {
+  const NoteCard({
     required this.note,
     required this.onTap,
     required this.onDelete,
