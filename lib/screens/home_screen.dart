@@ -176,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }
             },
-            icon: const Icon(Icons.logout_rounded),
+            icon: const Icon(Icons.where_to_vote_rounded),
           ),
           IconButton(
             tooltip: '登出',
