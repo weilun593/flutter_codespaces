@@ -113,9 +113,24 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  /*Future<void> _checkIn() async {
-    await Supabase.instance.client.auth.signOut();
-  }*/
+  Future<void> _checkIn() async {
+    try {
+      Position position = await LocationHelper.determinePosition();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('緯度: ${position.latitude}, 經度: ${position.longitude}'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('發生錯誤: $e'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
 
   Future<void> _signOut() async {
     await Supabase.instance.client.auth.signOut();
@@ -160,26 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
           IconButton(
             tooltip: '打卡',
-            onPressed: () async {
-              try {
-                Position position = await LocationHelper.determinePosition();
-                // ignore: use_build_context_synchronously
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('緯度: ${position.latitude}, 經度: ${position.longitude}'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              } catch (e) {
-                // ignore: use_build_context_synchronously
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('發生錯誤: $e'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              }
-            },
+            onPressed: _checkIn,
             icon: const Icon(Icons.where_to_vote_rounded),
           ),
           IconButton(
