@@ -19,6 +19,7 @@ dependencies:
   window_manager: ^0.5.2
   supabase_flutter: ^2.16.0
   geolocator: ^13.0.2
+  geocoding: ^3.0.0
   image_picker: ^1.1.2
 
 dev_dependencies:

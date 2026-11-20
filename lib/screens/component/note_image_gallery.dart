@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'note_image_preview_dialog.dart';
+
 class NoteImageGallery extends StatelessWidget {
   const NoteImageGallery({
     required this.imageUrls,
@@ -24,17 +26,26 @@ class NoteImageGallery extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                url,
-                width: 220,
-                height: maxHeight,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => Container(
-                  width: 220,
-                  height: maxHeight,
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  alignment: Alignment.center,
-                  child: const Icon(Icons.broken_image_outlined),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => showDialog<void>(
+                    context: context,
+                    builder: (_) => NoteImagePreviewDialog(imageUrl: url),
+                  ),
+                  child: Image.network(
+                    url,
+                    width: 220,
+                    height: maxHeight,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => Container(
+                      width: 220,
+                      height: maxHeight,
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      alignment: Alignment.center,
+                      child: const Icon(Icons.broken_image_outlined),
+                    ),
+                  ),
                 ),
               ),
             ),

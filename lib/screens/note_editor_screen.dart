@@ -115,7 +115,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   Future<void> _insertCheckIn() async {
     setState(() => _isCheckingIn = true);
     try {
-      final position = await LocationHelper.determinePosition();
+      final address = await LocationHelper.determineAddress();
       if (!mounted) return;
       final selection = _contentController.selection;
       final start = selection.isValid
@@ -125,16 +125,13 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       final text = _contentController.text;
       final prefix = start > 0 && text[start - 1] != '\n' ? '\n\n' : '';
       final suffix = end < text.length && text[end] != '\n' ? '\n' : '';
-      final coordinates = '打卡座標\n'
-          '緯度: ${position.latitude.toStringAsFixed(6)}\n'
-          '經度: ${position.longitude.toStringAsFixed(6)}';
-      final insertion = '$prefix$coordinates$suffix';
+        final insertion = '$prefix打卡地址：$address$suffix';
       _contentController.value = TextEditingValue(
         text: text.replaceRange(start, end, insertion),
         selection: TextSelection.collapsed(offset: start + insertion.length),
       );
     } catch (error) {
-      if (mounted) _showMessage('無法取得打卡位置：$error');
+      if (mounted) _showMessage('無法取得目前地址：$error');
     } finally {
       if (mounted) setState(() => _isCheckingIn = false);
     }
@@ -243,7 +240,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                                   ),
                                 )
                               : const Icon(Icons.location_on_outlined),
-                          label: const Text('插入打卡座標'),
+                          label: const Text('插入目前地址'),
                         ),
                         OutlinedButton.icon(
                           onPressed: _isSaving || _isUploadingImage

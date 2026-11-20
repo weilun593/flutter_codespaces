@@ -1,4 +1,5 @@
 //import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
 class LocationHelper {
@@ -34,5 +35,36 @@ class LocationHelper {
         accuracy: LocationAccuracy.high, // 高精準度 (GPS)
       ),
     );
+  }
+
+  static Future<String> determineAddress() async {
+    final position = await determinePosition();
+    final placemarks = await placemarkFromCoordinates(
+      position.latitude,
+      position.longitude,
+    );
+    if (placemarks.isEmpty) {
+      throw StateError('找不到目前位置的地址，請稍後再試。');
+    }
+
+    final placemark = placemarks.first;
+    final parts = <String>[];
+    for (final value in [
+      placemark.administrativeArea,
+      placemark.subAdministrativeArea,
+      placemark.locality,
+      placemark.subLocality,
+      placemark.thoroughfare,
+      placemark.subThoroughfare,
+    ]) {
+      final part = value?.trim();
+      if (part != null && part.isNotEmpty && !parts.contains(part)) {
+        parts.add(part);
+      }
+    }
+    if (parts.isEmpty) {
+      throw StateError('找不到目前位置的地址，請稍後再試。');
+    }
+    return parts.join('');
   }
 }
