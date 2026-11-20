@@ -28,7 +28,7 @@ class EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            hasSearch ? '沒有找到相符的筆記' : '這裡還是空的',
+            hasSearch ? '沒有找到相符的紀錄' : '這裡還是空的',
             style: theme.textTheme.titleLarge,
           ),
           const SizedBox(height: 7),

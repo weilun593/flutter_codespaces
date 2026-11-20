@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() => _errorMessage = _friendlyDatabaseError(error.message));
       }
     } catch (_) {
-      if (mounted) setState(() => _errorMessage = '目前無法載入筆記，請稍後再試。');
+      if (mounted) setState(() => _errorMessage = '目前無法載入內容，請稍後再試。');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -76,14 +76,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
     if (result == null || !mounted) return;
     await _loadNotes();
-    _showMessage(note == null ? '筆記已建立' : '筆記已更新');
+    _showMessage(note == null ? '紀錄已建立' : '紀錄已更新');
   }
 
   Future<void> _deleteNote(Note note) async {
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('刪除這篇筆記？'),
+        title: const Text('刪除這則記錄？'),
         content: Text('「${note.title}」刪除後就不能復原。'),
         actions: [
           TextButton(
@@ -111,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(
         () => _notes = _notes.where((item) => item.id != note.id).toList(),
       );
-      _showMessage('筆記已刪除');
+      _showMessage('紀錄已刪除');
     } on PostgrestException catch (error) {
       if (mounted) _showMessage(_friendlyDatabaseError(error.message));
     }
@@ -127,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return '找不到 notes 資料表，請先執行 supabase/schema.sql。';
     }
     if (message.toLowerCase().contains('permission')) {
-      return '沒有存取筆記的權限，請檢查 RLS 設定。';
+      return '沒有存取紀錄的權限，請檢查 RLS 設定。';
     }
     return message;
   }
@@ -170,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openEditor(),
         icon: const Icon(Icons.add_rounded),
-        label: const Text('新增筆記'),
+        label: const Text('新增紀錄'),
       ),
       body: RefreshIndicator(
         onRefresh: _loadNotes,
@@ -255,7 +255,7 @@ class _HomeContent extends StatelessWidget {
         const SizedBox(height: 28),
         Row(
           children: [
-            Text('你的筆記', style: theme.textTheme.titleLarge),
+            Text('你的紀錄', style: theme.textTheme.titleLarge),
             const SizedBox(width: 10),
             if (totalNotes > 0)
               Container(

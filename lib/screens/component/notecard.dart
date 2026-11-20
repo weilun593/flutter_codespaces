@@ -63,7 +63,7 @@ class NoteCard extends StatelessWidget {
                             itemBuilder: (_) => const [
                               PopupMenuItem(
                                 value: 'delete',
-                                child: Text('刪除筆記'),
+                                child: Text('刪除紀錄'),
                               ),
                             ],
                           ),

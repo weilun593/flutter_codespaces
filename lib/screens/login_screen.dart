@@ -137,7 +137,7 @@ class _WelcomePanel extends StatelessWidget {
         Text('把想法留在\n一個安靜的地方。', style: theme.textTheme.displaySmall),
         const SizedBox(height: 18),
         Text(
-          'Notely 是你的日常筆記桌。\n記下靈感、整理計畫，隨時在雲端找到它們。',
+          'Notely 是你的日常記事本。\n記下行程、整理計畫，隨時在雲端找到它們。',
           style: theme.textTheme.bodyLarge?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -246,7 +246,7 @@ class _LoginCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                isRegisterMode ? '註冊後，你的筆記會自動安全同步。' : '登入後繼續整理你的思緒。',
+                isRegisterMode ? '註冊後，你的紀錄會自動安全同步。' : '登入後繼續整理你的思緒。',
                 style: theme.textTheme.bodyMedium,
               ),
               const SizedBox(height: 28),

@@ -39,7 +39,7 @@ class SupabaseSetupScreen extends StatelessWidget {
                     Text('Notely 還差最後一步', style: theme.textTheme.headlineSmall),
                     const SizedBox(height: 10),
                     Text(
-                      '目前尚未設定 Supabase，所以登入與雲端筆記功能還不能啟用。',
+                      '目前尚未設定 Supabase，所以登入與雲端紀錄功能還不能啟用。',
                       style: theme.textTheme.bodyLarge,
                     ),
                     const SizedBox(height: 24),

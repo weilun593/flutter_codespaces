@@ -44,7 +44,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     _contentController = TextEditingController(
       text: NoteContent.text(widget.note?.content ?? ''),
     );
-    _tagController = TextEditingController(text: widget.note?.tag ?? '靈感');
+    _tagController = TextEditingController(text: widget.note?.tag ?? '行程');
     _selectedColor = widget.note?.color ?? 'indigo';
     _isPinned = widget.note?.isPinned ?? false;
   }
@@ -60,7 +60,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   Future<void> _save() async {
     final title = _titleController.text.trim();
     if (title.isEmpty) {
-      _showMessage('請先為筆記寫個標題。');
+      _showMessage('請先為記錄寫個標題。');
       return;
     }
 
@@ -125,7 +125,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       final text = _contentController.text;
       final prefix = start > 0 && text[start - 1] != '\n' ? '\n\n' : '';
       final suffix = end < text.length && text[end] != '\n' ? '\n' : '';
-        final insertion = '$prefix打卡地址：$address$suffix';
+      final insertion = '$prefix$address$suffix';
       _contentController.value = TextEditingValue(
         text: text.replaceRange(start, end, insertion),
         selection: TextSelection.collapsed(offset: start + insertion.length),
@@ -177,7 +177,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
               : () => Navigator.pop(context),
           icon: const Icon(Icons.close_rounded),
         ),
-        title: Text(_isEditing ? '編輯筆記' : '新增筆記'),
+        title: Text(_isEditing ? '編輯內容' : '新增內容'),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
@@ -214,7 +214,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       textInputAction: TextInputAction.next,
                       style: theme.textTheme.headlineSmall,
                       decoration: const InputDecoration(
-                        hintText: '筆記標題',
+                        hintText: '紀錄標題',
                         border: InputBorder.none,
                         enabledBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
@@ -240,7 +240,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                                   ),
                                 )
                               : const Icon(Icons.location_on_outlined),
-                          label: const Text('插入目前地址'),
+                          label: const Text('目前地址'),
                         ),
                         OutlinedButton.icon(
                           onPressed: _isSaving || _isUploadingImage
@@ -344,7 +344,7 @@ class _ColorPicker extends StatelessWidget {
       children: AppColors.noteColors.entries.map((entry) {
         final selected = entry.key == selectedColor;
         return Tooltip(
-          message: '筆記顏色',
+          message: '紀錄顏色',
           child: GestureDetector(
             onTap: () => onChanged(entry.key),
             child: Container(
