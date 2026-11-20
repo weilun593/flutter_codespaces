@@ -81,7 +81,7 @@ class _CodeLine extends StatelessWidget {
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'monospace',
           fontSize: 12,
           color: Theme.of(context).colorScheme.onSurface,
