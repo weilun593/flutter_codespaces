@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import './core/app_config.dart';
@@ -16,7 +17,12 @@ Future<void> main() async {
     );
   }
 
-  runApp(const NotelyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeModeController(),
+      child: const NotelyApp(),
+    ),
+  );
 }
 
 class NotelyApp extends StatelessWidget {
@@ -24,13 +30,17 @@ class NotelyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Notely',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.light(),
-      home: AppConfig.isConfigured
-          ? const AuthGate()
-          : const SupabaseSetupScreen(),
+    return Consumer<ThemeModeController>(
+      builder: (context, themeController, child) => MaterialApp(
+        title: 'Notely',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light(),
+        darkTheme: AppTheme.dark(),
+        themeMode: themeController.themeMode,
+        home: AppConfig.isConfigured
+            ? const AuthGate()
+            : const SupabaseSetupScreen(),
+      ),
     );
   }
 }

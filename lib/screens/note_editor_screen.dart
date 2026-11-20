@@ -239,7 +239,10 @@ class _ColorPicker extends StatelessWidget {
                 color: entry.value,
                 shape: BoxShape.circle,
                 border: selected
-                    ? Border.all(color: AppColors.ink, width: 3)
+                    ? Border.all(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        width: 3,
+                      )
                     : Border.all(color: Colors.transparent, width: 3),
               ),
               child: selected

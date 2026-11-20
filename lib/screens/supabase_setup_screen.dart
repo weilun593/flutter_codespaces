@@ -10,6 +10,7 @@ class SupabaseSetupScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
+      appBar: AppBar(actions: const [ThemeModeToggle()]),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -77,13 +78,13 @@ class _CodeLine extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      color: const Color(0xFFF1F0EB),
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: Text(
         text,
         style: const TextStyle(
           fontFamily: 'monospace',
           fontSize: 12,
-          color: AppColors.ink,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
     );

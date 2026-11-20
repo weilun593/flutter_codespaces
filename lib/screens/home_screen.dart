@@ -173,6 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(width: 18),
           ],
+          const ThemeModeToggle(),
           IconButton(
             tooltip: '打卡',
             onPressed: _checkIn,
@@ -260,7 +261,9 @@ class _HomeContent extends StatelessWidget {
         const SizedBox(height: 6),
         Text(
           totalNotes == 0 ? '今天想記下什麼？' : '把腦中的想法，整理成下一步。',
-          style: theme.textTheme.bodyLarge?.copyWith(color: AppColors.mutedInk),
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: 28),
         TextField(

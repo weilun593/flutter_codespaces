@@ -88,30 +88,35 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1040),
-              child: isWide
-                  ? Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Expanded(child: _WelcomePanel()),
-                        const SizedBox(width: 72),
-                        Expanded(child: loginCard),
-                      ],
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const _BrandMark(compact: true),
-                        const SizedBox(height: 28),
-                        loginCard,
-                      ],
-                    ),
+        child: Stack(
+          children: [
+            Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1040),
+                  child: isWide
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Expanded(child: _WelcomePanel()),
+                            const SizedBox(width: 72),
+                            Expanded(child: loginCard),
+                          ],
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const _BrandMark(compact: true),
+                            const SizedBox(height: 28),
+                            loginCard,
+                          ],
+                        ),
+                ),
+              ),
             ),
-          ),
+            const Positioned(top: 0, right: 8, child: ThemeModeToggle()),
+          ],
         ),
       ),
     );
@@ -133,7 +138,9 @@ class _WelcomePanel extends StatelessWidget {
         const SizedBox(height: 18),
         Text(
           'Notely 是你的日常筆記桌。\n記下靈感、整理計畫，隨時在雲端找到它們。',
-          style: theme.textTheme.bodyLarge?.copyWith(color: AppColors.mutedInk),
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: 28),
         Row(
