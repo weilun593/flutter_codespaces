@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 import '../utils/location_helper.dart';
 import '../models/note.dart';
 import '../repositories/notes_repository.dart';
@@ -10,6 +9,7 @@ import './component/notecard.dart';
 import './component/appbrand.dart';
 import './component/emptystate.dart';
 import './component/errorstate.dart';
+import './component/location_coordinates_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -115,20 +115,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _checkIn() async {
     try {
-      Position position = await LocationHelper.determinePosition();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('緯度: ${position.latitude}, 經度: ${position.longitude}'),
-          duration: Duration(seconds: 2),
-        ),
+      final position = await LocationHelper.determinePosition();
+      if (!mounted) return;
+      await showDialog<void>(
+        context: context,
+        builder: (_) => LocationCoordinatesDialog(position: position),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('發生錯誤: $e'),
-          duration: Duration(seconds: 2),
-        ),
-      );
+      if (mounted) _showMessage('無法取得打卡位置：$e');
     }
   }
 
@@ -187,10 +181,23 @@ class _HomeScreenState extends State<HomeScreen> {
           SizedBox(width: isWide ? 28 : 12),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _openEditor(),
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('新增筆記'),
+      floatingActionButton: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton.extended(
+            heroTag: 'check-in-fab',
+            onPressed: _checkIn,
+            icon: const Icon(Icons.where_to_vote_rounded),
+            label: const Text('打卡'),
+          ),
+          const SizedBox(width: 12),
+          FloatingActionButton.extended(
+            heroTag: 'new-note-fab',
+            onPressed: () => _openEditor(),
+            icon: const Icon(Icons.add_rounded),
+            label: const Text('新增筆記'),
+          ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: _loadNotes,
