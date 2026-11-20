@@ -11,6 +11,14 @@ pluginManagement {
     includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
 
     repositories {
+        exclusiveContent {
+            forRepository {
+                mavenCentral()
+            }
+            filter {
+                includeGroup("org.jetbrains.kotlin")
+            }
+        }
         google()
         mavenCentral()
         gradlePluginPortal()
