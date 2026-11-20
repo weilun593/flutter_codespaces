@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../utils/location_helper.dart';
 import '../models/note.dart';
 import '../repositories/notes_repository.dart';
 import '../theme/app_theme.dart';
+import '../utils/note_content.dart';
 import 'note_editor_screen.dart';
 import './component/notecard.dart';
 import './component/appbrand.dart';
 import './component/emptystate.dart';
 import './component/errorstate.dart';
-import './component/location_coordinates_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -103,6 +102,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       await _repository.deleteNote(note.id);
+      try {
+        await _repository.deleteNoteImages(NoteContent.imageUrls(note.content));
+      } catch (_) {
+        // A failed cleanup does not undo deleting the note.
+      }
       if (!mounted) return;
       setState(
         () => _notes = _notes.where((item) => item.id != note.id).toList(),
@@ -110,19 +114,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _showMessage('筆記已刪除');
     } on PostgrestException catch (error) {
       if (mounted) _showMessage(_friendlyDatabaseError(error.message));
-    }
-  }
-
-  Future<void> _checkIn() async {
-    try {
-      final position = await LocationHelper.determinePosition();
-      if (!mounted) return;
-      await showDialog<void>(
-        context: context,
-        builder: (_) => LocationCoordinatesDialog(position: position),
-      );
-    } catch (e) {
-      if (mounted) _showMessage('無法取得打卡位置：$e');
     }
   }
 
@@ -169,11 +160,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
           const ThemeModeToggle(),
           IconButton(
-            tooltip: '打卡',
-            onPressed: _checkIn,
-            icon: const Icon(Icons.where_to_vote_rounded),
-          ),
-          IconButton(
             tooltip: '登出',
             onPressed: _signOut,
             icon: const Icon(Icons.logout_rounded),
@@ -181,23 +167,10 @@ class _HomeScreenState extends State<HomeScreen> {
           SizedBox(width: isWide ? 28 : 12),
         ],
       ),
-      floatingActionButton: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FloatingActionButton.extended(
-            heroTag: 'check-in-fab',
-            onPressed: _checkIn,
-            icon: const Icon(Icons.where_to_vote_rounded),
-            label: const Text('打卡'),
-          ),
-          const SizedBox(width: 12),
-          FloatingActionButton.extended(
-            heroTag: 'new-note-fab',
-            onPressed: () => _openEditor(),
-            icon: const Icon(Icons.add_rounded),
-            label: const Text('新增筆記'),
-          ),
-        ],
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _openEditor(),
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('新增筆記'),
       ),
       body: RefreshIndicator(
         onRefresh: _loadNotes,
@@ -264,19 +237,11 @@ class _HomeContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('早安，$greetingName', style: theme.textTheme.headlineSmall),
-        const SizedBox(height: 6),
-        Text(
-          totalNotes == 0 ? '今天想記下什麼？' : '把腦中的想法，整理成下一步。',
-          style: theme.textTheme.bodyLarge?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
         const SizedBox(height: 28),
         TextField(
           controller: searchController,
           decoration: InputDecoration(
-            hintText: '搜尋你的筆記…',
+            hintText: '搜尋…',
             prefixIcon: const Icon(Icons.search_rounded),
             suffixIcon: searchController.text.isNotEmpty
                 ? IconButton(

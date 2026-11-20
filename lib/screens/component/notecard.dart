@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/note.dart';
 import '../../theme/app_theme.dart';
+import '../../utils/note_content.dart';
 
 class NoteCard extends StatelessWidget {
   const NoteCard({
@@ -17,7 +18,8 @@ class NoteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final accent = AppColors.noteColor(note.color);
     final theme = Theme.of(context);
-    final preview = note.content.replaceAll('\n', ' ').trim();
+    final preview = NoteContent.text(note.content).replaceAll('\n', ' ').trim();
+    final imageUrls = NoteContent.imageUrls(note.content);
     final date = '${note.updatedAt.month}/${note.updatedAt.day}';
 
     return Card(
@@ -74,6 +76,25 @@ class NoteCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodyMedium,
                       ),
+                      if (imageUrls.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: Image.network(
+                              imageUrls.first,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, _, _) => ColoredBox(
+                                color: theme.colorScheme.surfaceContainerHighest,
+                                child: const Center(
+                                  child: Icon(Icons.broken_image_outlined),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                       const Spacer(),
                       const SizedBox(height: 18),
                       Row(

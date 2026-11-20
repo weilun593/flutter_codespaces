@@ -4,6 +4,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/note.dart';
 import '../repositories/notes_repository.dart';
 import '../theme/app_theme.dart';
+import '../utils/location_helper.dart';
+import '../utils/note_content.dart';
+import '../utils/note_image_helper.dart';
+import 'component/note_image_gallery.dart';
 
 class NoteEditorScreen extends StatefulWidget {
   const NoteEditorScreen({super.key, this.note});
@@ -19,9 +23,14 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   late final TextEditingController _titleController;
   late final TextEditingController _contentController;
   late final TextEditingController _tagController;
+  late final List<String> _imageUrls;
+  late final List<String> _originalImageUrls;
+  final List<String> _uploadedImageUrls = [];
   late String _selectedColor;
   late bool _isPinned;
   bool _isSaving = false;
+  bool _isCheckingIn = false;
+  bool _isUploadingImage = false;
 
   bool get _isEditing => widget.note != null;
 
@@ -29,9 +38,11 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   void initState() {
     super.initState();
     _repository = NotesRepository(Supabase.instance.client);
+    _imageUrls = NoteContent.imageUrls(widget.note?.content ?? '');
+    _originalImageUrls = List.unmodifiable(_imageUrls);
     _titleController = TextEditingController(text: widget.note?.title ?? '');
     _contentController = TextEditingController(
-      text: widget.note?.content ?? '',
+      text: NoteContent.text(widget.note?.content ?? ''),
     );
     _tagController = TextEditingController(text: widget.note?.tag ?? '靈感');
     _selectedColor = widget.note?.color ?? 'indigo';
@@ -61,7 +72,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
             widget.note?.userId ??
             Supabase.instance.client.auth.currentUser!.id,
         title: title,
-        content: _contentController.text.trim(),
+        content: NoteContent.withImages(_contentController.text, _imageUrls),
         tag: _tagController.text.trim().isEmpty
             ? '未分類'
             : _tagController.text.trim(),
@@ -79,6 +90,18 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           draft: note,
         );
       }
+      final retainedUrls = _imageUrls.toSet();
+      final removedUrls = {
+        ..._originalImageUrls,
+        ..._uploadedImageUrls,
+      }.difference(retainedUrls).toList();
+      if (removedUrls.isNotEmpty) {
+        try {
+          await _repository.deleteNoteImages(removedUrls);
+        } catch (_) {
+          // A failed cleanup leaves an unused file but does not undo the note save.
+        }
+      }
       if (mounted) Navigator.of(context).pop(note);
     } on PostgrestException catch (error) {
       if (mounted) _showMessage(error.message);
@@ -86,6 +109,54 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       if (mounted) _showMessage('儲存失敗，請檢查網路後再試。');
     } finally {
       if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  Future<void> _insertCheckIn() async {
+    setState(() => _isCheckingIn = true);
+    try {
+      final position = await LocationHelper.determinePosition();
+      if (!mounted) return;
+      final selection = _contentController.selection;
+      final start = selection.isValid
+          ? selection.start
+          : _contentController.text.length;
+      final end = selection.isValid ? selection.end : start;
+      final text = _contentController.text;
+      final prefix = start > 0 && text[start - 1] != '\n' ? '\n\n' : '';
+      final suffix = end < text.length && text[end] != '\n' ? '\n' : '';
+      final coordinates = '打卡座標\n'
+          '緯度: ${position.latitude.toStringAsFixed(6)}\n'
+          '經度: ${position.longitude.toStringAsFixed(6)}';
+      final insertion = '$prefix$coordinates$suffix';
+      _contentController.value = TextEditingValue(
+        text: text.replaceRange(start, end, insertion),
+        selection: TextSelection.collapsed(offset: start + insertion.length),
+      );
+    } catch (error) {
+      if (mounted) _showMessage('無法取得打卡位置：$error');
+    } finally {
+      if (mounted) setState(() => _isCheckingIn = false);
+    }
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      final ownerId = Supabase.instance.client.auth.currentUser!.id;
+      setState(() => _isUploadingImage = true);
+      final url = await NoteImageHelper.pickAndUpload(
+        repository: _repository,
+        ownerId: ownerId,
+      );
+      if (url == null || !mounted) return;
+      setState(() {
+        _imageUrls.add(url);
+        _uploadedImageUrls.add(url);
+      });
+    } catch (error) {
+      if (mounted) _showMessage('圖片上傳失敗：$error');
+    } finally {
+      if (mounted) setState(() => _isUploadingImage = false);
     }
   }
 
@@ -104,7 +175,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       appBar: AppBar(
         leading: IconButton(
           tooltip: '返回',
-          onPressed: _isSaving ? null : () => Navigator.pop(context),
+            onPressed: _isSaving || _isCheckingIn || _isUploadingImage
+              ? null
+              : () => Navigator.pop(context),
           icon: const Icon(Icons.close_rounded),
         ),
         title: Text(_isEditing ? '編輯筆記' : '新增筆記'),
@@ -112,7 +185,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: FilledButton.icon(
-              onPressed: _isSaving ? null : _save,
+                onPressed: _isSaving || _isCheckingIn || _isUploadingImage
+                  ? null
+                  : _save,
               icon: _isSaving
                   ? const SizedBox(
                       width: 16,
@@ -151,6 +226,50 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       ),
                     ),
                     const Divider(height: 30),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: _isSaving || _isCheckingIn
+                              ? null
+                              : _insertCheckIn,
+                          icon: _isCheckingIn
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.location_on_outlined),
+                          label: const Text('插入打卡座標'),
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: _isSaving || _isUploadingImage
+                              ? null
+                              : _pickImage,
+                          icon: _isUploadingImage
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.add_photo_alternate_outlined),
+                          label: Text(_isUploadingImage ? '圖片上傳中' : '上傳圖片'),
+                        ),
+                      ],
+                    ),
+                    if (_imageUrls.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      NoteImageGallery(
+                        imageUrls: _imageUrls,
+                        onRemove: (url) => setState(() => _imageUrls.remove(url)),
+                      ),
+                    ],
+                    const SizedBox(height: 20),
                     TextField(
                       controller: _contentController,
                       minLines: 10,

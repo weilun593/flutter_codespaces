@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/note.dart';
 
@@ -5,6 +7,35 @@ class NotesRepository {
   NotesRepository(this._client);
 
   final SupabaseClient _client;
+
+  Future<String> uploadNoteImage({
+    required String ownerId,
+    required String fileName,
+    required String contentType,
+    required Uint8List bytes,
+  }) async {
+    final safeName = fileName.replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
+    final path = '$ownerId/${DateTime.now().microsecondsSinceEpoch}_$safeName';
+    await _client.storage.from('note-images').uploadBinary(
+      path,
+      bytes,
+      fileOptions: FileOptions(contentType: contentType),
+    );
+    return _client.storage.from('note-images').getPublicUrl(path);
+  }
+
+  Future<void> deleteNoteImages(List<String> publicUrls) async {
+    const publicPath = '/object/public/note-images/';
+    final paths = publicUrls.map((url) {
+      final path = Uri.parse(url).path;
+      final markerIndex = path.indexOf(publicPath);
+      if (markerIndex < 0) return null;
+      return Uri.decodeComponent(path.substring(markerIndex + publicPath.length));
+    }).whereType<String>().toList();
+    if (paths.isNotEmpty) {
+      await _client.storage.from('note-images').remove(paths);
+    }
+  }
 
   Future<List<Note>> fetchNotes() async {
     final rows = await _client
